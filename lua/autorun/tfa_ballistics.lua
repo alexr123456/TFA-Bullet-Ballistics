@@ -38,7 +38,8 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos,
                   ["ang"] = ang,
                   ["weapon"] = weapon,
                   ["dropamount"] = 0,
-                  ["ent"] = bulletent
+                  ["ent"] = bulletent,
+                  ["lifetime"] = 0
             }
 
             table.insert( TFA_BALLISTICS.Bullets, bulletdata )
@@ -64,10 +65,12 @@ TFA_BALLISTICS.Simulate = function( bullet )
             return false
       end
 
+      bullet["lifetime"] = bullet["lifetime"] + ( 0.1 * game.GetTimeScale() )
+
       local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
       local grav_vec = Vector( 0, 0,GetConVarNumber("sv_gravity") )
       local velocity = bullet["dir"] * sourcevelocity
-      local finalvelocity = velocity - ( grav_vec * 3.28084 * 12 ) * FrameTime() / 2
+      local finalvelocity = velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2
 
       local bullet_trace = util.TraceLine( {
       	start = bullet["pos"],
@@ -80,7 +83,6 @@ TFA_BALLISTICS.Simulate = function( bullet )
       )
 
       if water_trace.Hit then
-
             bullet["weapon"].MainBullet.Attacker = bullet["owner"]
 		bullet["weapon"].MainBullet.Inflictor = bullet["weapon"]
 		bullet["weapon"].MainBullet.Num = 1

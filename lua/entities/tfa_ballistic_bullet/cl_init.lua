@@ -1,8 +1,8 @@
 include('shared.lua')
 
 function ENT:Initialize()
-    ParticleEffectAttach( "dax_bullettrail3_green", PATTACH_ABSORIGIN_FOLLOW, self, 1)
-    self.Initialized = true
+      ParticleEffectAttach( "dax_bullettrail3_red", PATTACH_ABSORIGIN_FOLLOW, self, 1)
+      self.Initialized = true
 end
 
 function ENT:OnRemove()
