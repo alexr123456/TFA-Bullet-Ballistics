@@ -25,9 +25,9 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) issues if possible.
 
 # Credits
-TFA - Helping with bullet drop and velocity code
-Matsilagi - Particles and Workarounds
-Daxble - Everything else
+TFA - Helping with bullet drop and velocity code  
+Matsilagi - Particles and Workarounds  
+Daxble - Everything else  
 
 # License
 
