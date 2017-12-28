@@ -1,0 +1,7 @@
+net.Receive( "TFA_BALLISTICS_DoImpact", function ()
+      local weapon = net.ReadEntity()
+      local hitpos = net.ReadVector()
+      local hitnormal = net.ReadVector()
+      local mattype = net.ReadInt( 32 )
+      weapon:ImpactEffectFunc( hitpos, hitnormal, mattype )
+end)
