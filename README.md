@@ -1,5 +1,5 @@
 # TFA Bullet Ballistics
-This is currently not intended for players, if you are a developer please read below.
+This is an in development build, this is not meant for players just yet.
 
 To get ballistics working with your weapon you only have to do two things.
 
@@ -12,8 +12,13 @@ SWEP.Base = "tfa_ballistic_base"
 SWEP.Primary.Velocity = 760 // Velocity in Meters
 ```
 
+# To Do
+1. Fix bugs
+2. Add wind system
+3. Proper bullet drop using verlet integration
+
 # Bugs
 1. Aimcone doesn't do anything
-2. Firing at feet causes bullet to go through surface
+2. Firing at feet causes bullet to go through surface ( Fixed )
 
-Please report other bugs in issues if possible.
+Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) issues if possible.
