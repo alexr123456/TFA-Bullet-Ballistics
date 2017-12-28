@@ -16,7 +16,7 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 1. Fix bugs
 2. Add wind system
 3. Proper bullet drop using verlet integration ( Done I think )
-4. Coriolis Effect
+4. Eötvös Effect
 
 # Bugs
 1. Aimcone doesn't do anything
