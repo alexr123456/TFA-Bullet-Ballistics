@@ -10,6 +10,4 @@ function ENT:Initialize()
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_NONE )
 
-	ParticleEffectAttach( "dax_bullettrail2", PATTACH_ABSORIGIN_FOLLOW, self, 1)
-
 end

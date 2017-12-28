@@ -2,6 +2,9 @@ DEFINE_BASECLASS("tfa_gun_base")
 
 SWEP.Primary.Velocity = 500
 
+local TracerName
+local cv_forcemult = GetConVar("sv_tfa_force_multiplier")
+
 function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet, bulletoverride)
 	if not IsFirstTimePredicted() and not game.SinglePlayer() then return end
 	num_bullets = num_bullets or 1
@@ -9,7 +12,71 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 
 	local velocity = self:GetStat("Primary.Velocity")
 
-	TFA_BALLISTICS.AddBullet( damage, velocity, aimcone, num_bullets, self.Owner:EyePos(), self.Owner:GetAimVector(), self.Owner, self.Owner:GetAngles(), self )
+	if self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) >= 1000 then
+		TFA_BALLISTICS.AddBullet( damage, velocity, aimcone, num_bullets, self.Owner:EyePos(), self.Owner:GetAimVector(), self.Owner, self.Owner:GetAngles(), self )
+	else
+		if self.Tracer == 1 then
+			TracerName = "Ar2Tracer"
+		elseif self.Tracer == 2 then
+			TracerName = "AirboatGunHeavyTracer"
+		else
+			TracerName = "Tracer"
+		end
+
+		self.MainBullet.PCFTracer = nil
+
+		if self.TracerName and self.TracerName ~= "" then
+			if self.TracerPCF then
+				TracerName = nil
+				self.MainBullet.PCFTracer = self.TracerName
+				self.MainBullet.Tracer = 0
+			else
+				TracerName = self.TracerName
+			end
+		end
+
+		self.MainBullet.Attacker = self:GetOwner()
+		self.MainBullet.Inflictor = self
+		self.MainBullet.Num = num_bullets
+		self.MainBullet.Src = self:GetOwner():GetShootPos()
+		self.MainBullet.Dir = self:GetOwner():GetAimVector()
+		self.MainBullet.HullSize = self:GetStat("Primary.HullSize") or 0
+		self.MainBullet.Spread.x = aimcone
+		self.MainBullet.Spread.y = aimcone
+		if self.TracerPCF then
+			self.MainBullet.Tracer = 0
+		else
+			self.MainBullet.Tracer = self.TracerCount and self.TracerCount or 3
+		end
+		self.MainBullet.TracerName = TracerName
+		self.MainBullet.PenetrationCount = 0
+		self.MainBullet.AmmoType = self:GetPrimaryAmmoType()
+		self.MainBullet.Force = damage / 6 * math.sqrt(self:GetStat("Primary.KickUp") + self:GetStat("Primary.KickDown") + self:GetStat("Primary.KickHorizontal")) * cv_forcemult:GetFloat() * self:GetAmmoForceMultiplier()
+		self.MainBullet.Damage = damage
+		self.MainBullet.HasAppliedRange = false
+
+		if self.CustomBulletCallback then
+			self.MainBullet.Callback2 = self.CustomBulletCallback
+		end
+
+		self.MainBullet.Callback = function(a, b, c)
+			if IsValid(self) then
+				c:SetInflictor(self)
+				if self.MainBullet.Callback2 then
+					self.MainBullet.Callback2(a, b, c)
+				end
+
+				self.MainBullet:Penetrate(a, b, c, self)
+
+				self:PCFTracer( self.MainBullet, b.HitPos or vector_origin )
+			end
+		end
+
+		self:GetOwner():FireBullets(self.MainBullet)
+	end
+
+	print( self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) )
+
 end
 
 function SWEP:ImpactEffectFunc(pos, normal, mattype)

@@ -5,3 +5,8 @@ net.Receive( "TFA_BALLISTICS_DoImpact", function ()
       local mattype = net.ReadInt( 32 )
       weapon:ImpactEffectFunc( hitpos, hitnormal, mattype )
 end)
+
+net.Receive( "TFA_BALLISTICS_StopParticles", function ()
+      local ent = net.ReadEntity()
+      ent:StopParticles()
+end)

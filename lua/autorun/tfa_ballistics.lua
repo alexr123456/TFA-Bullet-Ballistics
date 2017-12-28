@@ -1,12 +1,17 @@
 if SERVER then
       util.AddNetworkString( "TFA_BALLISTICS_DoImpact" )
       util.AddNetworkString( "TFA_BALLISTICS_AddBullet" )
+      util.AddNetworkString( "TFA_BALLISTICS_StopParticles" )
 end
 
-game.AddParticles( "particles/tfa_ballistics/dax_tracers.pcf" )
+game.AddParticles( "particles/tfa_ballistics/dax_bullettrails.pcf" )
 
-PrecacheParticleSystem( "dax_bulettrail" )
 PrecacheParticleSystem( "dax_bullettrail2" )
+PrecacheParticleSystem( "dax_bullettrail2_red" )
+PrecacheParticleSystem( "dax_bullettrail2_green" )
+PrecacheParticleSystem( "dax_bullettrail3" )
+PrecacheParticleSystem( "dax_bullettrail3_red" )
+PrecacheParticleSystem( "dax_bullettrail3_green" )
 
 TFA_BALLISTICS = {}
 
@@ -16,33 +21,29 @@ TFA_BALLISTICS.Wind = Angle( 0, 0, 0 )
 
 TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos, dir, owner, ang, weapon)
 
-      local bulletent = ents.Create("tfa_ballistic_bullet")
-      bulletent:SetPos( pos )
-      bulletent:SetAngles( ang )
-      bulletent:Spawn()
+      if SERVER then
+            local bulletent = ents.Create("tfa_ballistic_bullet")
+            bulletent:SetPos( pos )
+            bulletent:SetAngles( ang )
+            bulletent:Spawn()
 
-      local bulletdata = {
-            ["damage"] = damage,
-            ["velocity"] = velocity,
-            ["aimcone"] = aimcone,
-            ["num_bullets"] = num_bullets,
-            ["pos"] = pos,
-            ["dir"] = dir,
-            ["owner"] = owner,
-            ["ang"] = ang,
-            ["weapon"] = weapon,
-            ["dropamount"] = 0,
-            ["ent"] = bulletent
-      }
+            local bulletdata = {
+                  ["damage"] = damage,
+                  ["velocity"] = velocity,
+                  ["aimcone"] = aimcone,
+                  ["num_bullets"] = num_bullets,
+                  ["pos"] = pos,
+                  ["dir"] = dir,
+                  ["owner"] = owner,
+                  ["ang"] = ang,
+                  ["weapon"] = weapon,
+                  ["dropamount"] = 0,
+                  ["ent"] = bulletent
+            }
 
-      table.insert( TFA_BALLISTICS.Bullets, bulletdata )
+            table.insert( TFA_BALLISTICS.Bullets, bulletdata )
+      end
 
-      local final_bullet = TFA_BALLISTICS.Bullets[ #TFA_BALLISTICS.Bullets ]
-
-      net.Start( "TFA_BALLISTICS_AddBullet")
-            net.WriteTable( TFA_BALLISTICS.Bullets )
-            net.WriteTable( bulletdata )
-      net.Broadcast()
 
 end
 
@@ -63,19 +64,20 @@ TFA_BALLISTICS.Simulate = function( bullet )
             return false
       end
 
-      bullet["dropamount"] = bullet["dropamount"] or 0
+      local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
+      local grav_vec = Vector( 0, 0,GetConVarNumber("sv_gravity") )
+      local velocity = bullet["dir"] * sourcevelocity
+      local finalvelocity = velocity - ( grav_vec * 3.28084 * 12 ) * FrameTime() / 2
 
       local bullet_trace = util.TraceLine( {
       	start = bullet["pos"],
-            endpos = bullet["pos"] + ( bullet["dir"] * bullet["velocity"] ) + Vector(0, 0, bullet["dropamount"] )}
+            endpos = bullet["pos"] + ( finalvelocity ) * FrameTime() }
       )
       local water_trace = util.TraceLine( {
       	start = bullet["pos"],
-            endpos = bullet["pos"] + ( bullet["dir"] * bullet["velocity"] ) + Vector(0, 0, bullet["dropamount"] ),
+            endpos = bullet["pos"] + ( finalvelocity ) * FrameTime(),
             mask = MASK_WATER }
       )
-
-      bullet["dropamount"] = bullet["dropamount"] - ( FrameTime() )
 
       if water_trace.Hit then
 
@@ -170,13 +172,17 @@ TFA_BALLISTICS.Simulate = function( bullet )
             net.Broadcast()
 
             bullet["ent"]:StopParticles()
-            SafeRemoveEntity( bullet["ent"] )
-            table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
+            timer.Simple( 0, function()
+                  SafeRemoveEntity( bullet["ent"] )
+                  table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
+            end )
 
       end
 
-      bullet["pos"] = ( bullet["pos"] + ( bullet["dir"] * ( bullet["velocity"] / 6.5 ) ) ) + Vector(0, 0, bullet["dropamount"] )
+      local bulletpos = bullet["pos"] + ( finalvelocity ) * FrameTime()
 
-      bullet["ent"]:SetPos( ( bullet["pos"] + ( bullet["dir"] * ( bullet["velocity"] / 6.5 ) ) ) + Vector(0, 0, bullet["dropamount"] ) )
+      bullet["pos"] = bulletpos
+
+      bullet["ent"]:SetPos( bullet["pos"] )
 
 end
