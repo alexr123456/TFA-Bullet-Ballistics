@@ -45,7 +45,7 @@ Daxble - Everything else
 | Distribute  |   | Disclose Source*  |
 | Place Warranty  |   | Include License  |
 | Use Patent Claims  |   | Include Copyright  |
-| Modify  |   | Include Install Instructions  |
+|  |  | Include Install Instructions  |
 
 **Include Original:** You must include a link to this page or a copy of the code itself.
 
