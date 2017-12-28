@@ -7,7 +7,7 @@ To get ballistics working with your weapon you only have to do two things.
 ```lua
 SWEP.Base = "tfa_ballistic_base"
 ```
-2. Setup the bullet velocity
+2. Setup the bullet velocity ( This defaults to 500 )
 ```lua
 SWEP.Primary.Velocity = 760 // Velocity in Meters
 ```
