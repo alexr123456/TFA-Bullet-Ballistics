@@ -22,6 +22,7 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 1. Fix bugs
 2. Add wind system
 3. Proper bullet drop using verlet integration
+4. Eötvös effect
 
 # Bugs
 1. Aimcone doesn't do anything
@@ -45,7 +46,7 @@ Daxble - Everything else
 | Distribute  |   | Disclose Source*  |
 | Place Warranty  |   | Include License  |
 | Use Patent Claims  |   | Include Copyright  |
-|  |  | Include Install Instructions  |
+| Modify  |   | Include Install Instructions  |
 
 **Include Original:** You must include a link to this page or a copy of the code itself.
 
