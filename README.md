@@ -16,4 +16,4 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 1. Aimcone doesn't do anything
 2. Firing at feet causes bullet to go through surface
 
-Pleas report other bugs in issues if possible.
+Please report other bugs in issues if possible.
