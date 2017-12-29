@@ -27,9 +27,10 @@ A. You need to do the setup for **Every** weapon that needs ballistics
 ```lua
 SWEP.Base = "tfa_ballistic_base"
 ```
-4. Setup the bullet velocity
+4. Place the following lines somewhere in your weapon
 ```lua
-SWEP.Primary.Velocity = 760 // Velocity in Meters
+SWEP.Primary.Velocity = 760 // Velocity in Meters ( Defaults to 500 )
+SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrail2_red, dax_bullettrail2_green, dax_bullettrail3, dax_bullettrail3_red, dax_bullettrail3_green, nil to disable ( Defaults to dax_bullettrail3_green )
 ```
 
 # To Do
