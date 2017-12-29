@@ -1,6 +1,20 @@
 # TFA Bullet Ballistics
-This is currently not intended for players, if you are a developer please read below.
+This is currently not intended for players, if you are a developer please read [below](https://github.com/Daxble/TFA-Bullet-Ballistics#installationsetup).
 
+# FAQ
+Q. It doesn't seem like it's working up close?  
+A. Hitscan bullets are used on shots less than 1000 source units ( ~19.5 Meters )
+
+___
+
+Q. Why are the bullets so fast  
+A. This aims to simulate real bullets, not Battlefield bullets.  
+**Kar98K: Muzzle velocity = 760m/s, 300m shot, distance/velocity = 0.39 seconds to hit**
+
+___
+
+Q. Why isn't my weapon using the bullets?  
+A. You need to do the setup for **Every** weapon that needs ballistics
 
 # Installation/Setup
 
@@ -19,10 +33,11 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 ```
 
 # To Do
-1. Fix bugs
-2. Add wind system
-3. Proper bullet drop using verlet integration
+1. Fix bugs ( Always in Progress )
+2. Add wind system ( In Progress )
+3. Proper bullet drop using verlet integration ( Done )
 4. Eötvös effect
+5. Spin Drift
 
 # Bugs
 1. Aimcone doesn't do anything
@@ -31,9 +46,9 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) issues if possible.
 
 # Credits
-TFA - Helping with bullet drop and velocity code
-Matsilagi - Particles and Workarounds
-Daxble - Everything else
+TFA - Helping with bullet drop and velocity code  
+Matsilagi - Particles and Workarounds  
+Daxble - Everything else  
 
 # License
 
