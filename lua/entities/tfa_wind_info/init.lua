@@ -9,7 +9,7 @@ function ENT:Initialize()
 	self:PhysicsInit( SOLID_NONE )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_NONE )
-	self:SetBodyGroups( "010" )
+	self:SetBodyGroups( "011" )
 
 end
 

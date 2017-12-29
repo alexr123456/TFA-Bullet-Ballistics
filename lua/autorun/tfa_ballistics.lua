@@ -26,7 +26,6 @@ if SERVER then
 
       TFA_BALLISTICS.Wind = Angle( 0, TFA_BALLISTICS.Wind.Y, TFA_BALLISTICS.Wind.R )
       TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ))
-      TFA_BALLISTICS.WindDir = Vector(0, 0, 0)
 
       TFA_BALLISTICS.WindSpeed = math.Rand( 0, 8 )
       TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
@@ -44,16 +43,23 @@ if SERVER then
 
             if math.random( 1, 10000 ) == 250 then
                   TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ) )
+                  print("Major wind direction shift")
+            else
+                  if math.random(1, 750) == 50 then
+                        TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( TFA_BALLISTICS.WindApproach.y - 5, TFA_BALLISTICS.WindApproach.y + 5), math.Rand( TFA_BALLISTICS.WindApproach.r - 5, TFA_BALLISTICS.WindApproach.r + 5) )
+                        print("Slight wind direction shift")
+                  end
             end
             if math.random( 1, 1500 ) == 195 then
                   TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
+                  print("Wind speed change")
             end
 
-            TFA_BALLISTICS.WindSpeed = math.Approach( TFA_BALLISTICS.WindSpeed, TFA_BALLISTICS.WindSpeedApproach, 0.1 )
+            TFA_BALLISTICS.WindSpeed = math.Approach( TFA_BALLISTICS.WindSpeed, TFA_BALLISTICS.WindSpeedApproach, FrameTime() )
 
-            TFA_BALLISTICS.Wind.p = math.ApproachAngle( TFA_BALLISTICS.Wind.p, TFA_BALLISTICS.WindApproach.p, 0.1)
-            TFA_BALLISTICS.Wind.y = math.ApproachAngle( TFA_BALLISTICS.Wind.y, TFA_BALLISTICS.WindApproach.y, 0.1)
-            TFA_BALLISTICS.Wind.r = math.ApproachAngle( TFA_BALLISTICS.Wind.r, TFA_BALLISTICS.WindApproach.r, 0.1)
+            TFA_BALLISTICS.Wind.p = math.ApproachAngle( TFA_BALLISTICS.Wind.p, TFA_BALLISTICS.WindApproach.p, FrameTime())
+            TFA_BALLISTICS.Wind.y = math.ApproachAngle( TFA_BALLISTICS.Wind.y, TFA_BALLISTICS.WindApproach.y, FrameTime())
+            TFA_BALLISTICS.Wind.r = math.ApproachAngle( TFA_BALLISTICS.Wind.r, TFA_BALLISTICS.WindApproach.r, FrameTime())
             TFA_BALLISTICS.WindDir = AngleToVector( TFA_BALLISTICS.Wind )
 
             net.Start( "TFA_BALLISTICS_SendWindSpeed", false)
@@ -129,14 +135,15 @@ TFA_BALLISTICS.Simulate = function( bullet )
       local grav_vec = Vector( 0, 0,GetConVarNumber("sv_gravity") )
       local velocity = bullet["dir"] * sourcevelocity
       local finalvelocity = velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2
+      local windspeed = ( ( TFA_BALLISTICS.WindSpeed * 3.28084 * 12 / 0.75 ) * bullet["lifetime"] )
 
       local bullet_trace = util.TraceLine( {
       	start = bullet["pos"],
-            endpos = bullet["pos"] + ( finalvelocity ) * FrameTime() }
+            endpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime() }
       )
       local water_trace = util.TraceLine( {
       	start = bullet["pos"],
-            endpos = bullet["pos"] + ( finalvelocity ) * FrameTime(),
+            endpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime(),
             mask = MASK_WATER }
       )
 
@@ -183,8 +190,10 @@ TFA_BALLISTICS.Simulate = function( bullet )
             net.Broadcast()
 
             bullet["ent"]:StopParticles()
-            SafeRemoveEntity( bullet["ent"] )
-            table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
+            timer.Simple( 0, function()
+                  SafeRemoveEntity( bullet["ent"] )
+                  table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
+            end )
 
       end
 
@@ -238,8 +247,6 @@ TFA_BALLISTICS.Simulate = function( bullet )
             end )
 
       end
-
-      local windspeed = ( ( TFA_BALLISTICS.WindSpeed * 3.28084 * 12 / 0.75 ) * bullet["lifetime"] )
 
       local bulletpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime()
 
