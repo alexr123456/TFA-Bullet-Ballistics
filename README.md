@@ -23,6 +23,7 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 2. Add wind system
 3. Proper bullet drop using verlet integration
 4. Eötvös effect
+5. Spin Drift
 
 # Bugs
 1. Aimcone doesn't do anything
