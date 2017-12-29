@@ -14,5 +14,7 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+
 	self:SetAngles( TFA_BALLISTICS.Wind )
+	
 end

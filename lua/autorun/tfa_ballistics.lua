@@ -70,13 +70,19 @@ if SERVER then
 
 end
 
-TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, owner, ang, weapon)
+TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, owner, ang, weapon, tracereffect)
 
       if SERVER then
-            local bulletent = ents.Create("tfa_ballistic_bullet")
-            bulletent:SetPos( pos )
-            bulletent:SetAngles( ang )
-            bulletent:Spawn()
+            local bulletent
+
+            if tracereffect then
+                  bulletent = ents.Create("info_particle_system")
+                  bulletent:SetPos( pos )
+                  bulletent:SetKeyValue( "effect_name", tracereffect )
+                  bulletent:SetKeyValue( "start_active", "1")
+                  bulletent:Spawn()
+                  bulletent:Activate()
+            end
 
             local bulletdata = {
                   ["damage"] = damage,
@@ -89,10 +95,9 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, own
                   ["weapon"] = weapon,
                   ["dropamount"] = 0,
                   ["ent"] = bulletent,
-                  ["lifetime"] = 0
+                  ["lifetime"] = 0,
+                  ["tracer"] = tracereffect
             }
-
-            print( bulletdata["damage"] )
 
             table.insert( TFA_BALLISTICS.Bullets, bulletdata )
       end
@@ -132,13 +137,15 @@ TFA_BALLISTICS.Simulate = function( bullet )
 
       bullet["lifetime"] = bullet["lifetime"] + ( 0.1 * game.GetTimeScale() )
 
-      bullet["damage"] = bullet["damage"] * 0.985
-
       local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
       local grav_vec = Vector( 0, 0,GetConVarNumber("sv_gravity") )
       local velocity = bullet["dir"] * sourcevelocity
       local finalvelocity = velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2
       local windspeed = ( ( TFA_BALLISTICS.WindSpeed * 3.28084 * 12 / 0.75 ) * bullet["lifetime"] )
+
+      if IsValid( bullet["ent"] ) then
+            bullet["ent"]:SetAngles( finalvelocity:Angle() )
+      end
 
       local bullet_trace = util.TraceLine( {
       	start = bullet["pos"],
@@ -192,9 +199,11 @@ TFA_BALLISTICS.Simulate = function( bullet )
                   net.WriteInt( water_trace.MatType, 32 )
             net.Broadcast()
 
-            bullet["ent"]:StopParticles()
-            timer.Simple( 0, function()
+            if IsValid( bullet["ent"] ) then
+                  bullet["ent"]:StopParticles()
                   SafeRemoveEntity( bullet["ent"] )
+            end
+            timer.Simple( 0, function()
                   table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
             end )
 
@@ -243,11 +252,11 @@ TFA_BALLISTICS.Simulate = function( bullet )
                   net.WriteInt( bullet_trace.MatType, 32 )
             net.Broadcast()
 
-            print( bullet["damage"] )
-
-            bullet["ent"]:StopParticles()
-            timer.Simple( 0, function()
+            if IsValid( bullet["ent"] ) then
+                  bullet["ent"]:StopParticles()
                   SafeRemoveEntity( bullet["ent"] )
+            end
+            timer.Simple( 0, function()
                   table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
             end )
 
@@ -257,6 +266,8 @@ TFA_BALLISTICS.Simulate = function( bullet )
 
       bullet["pos"] = bulletpos
 
-      bullet["ent"]:SetPos( bullet["pos"] )
+      if IsValid( bullet["ent"] ) then
+            bullet["ent"]:SetPos( bullet["pos"] )
+      end
 
 end

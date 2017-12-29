@@ -3,6 +3,7 @@ SWEP.Base = "tfa_gun_base"
 DEFINE_BASECLASS(SWEP.Base)
 
 SWEP.Primary.Velocity = 500
+SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrail2_red, dax_bullettrail2_green, dax_bullettrail3, dax_bullettrail3_red, dax_bullettrail3_green, nil to disable
 
 local TracerName
 local cv_forcemult = GetConVar("sv_tfa_force_multiplier")
@@ -32,11 +33,11 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 			local finaldir = AngleToVector( direction )
 
 			if not self:GetIronSights() then
-				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self )
+				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
 			elseif num_bullets == 1 then
-				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), self.Owner:GetAimVector(), self.Owner, self.Owner:GetAngles(), self )
+				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), self.Owner:GetAimVector(), self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
 			else
-				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self )
+				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
 			end
 		end
 	else
@@ -133,6 +134,11 @@ function SWEP:ImpactEffectFunc(pos, normal, mattype)
 	end
 end
 
+function SWEP:Initialize()
+	self.Primary.Velocity = 500
+	self.TracerEffect = "dax_bullettrail3_green"
+	BaseClass.Initialize( self )
+end
 
 function SWEP:DoImpactEffect()
 end

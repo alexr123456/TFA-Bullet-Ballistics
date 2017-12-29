@@ -3,7 +3,9 @@ net.Receive( "TFA_BALLISTICS_DoImpact", function ()
       local hitpos = net.ReadVector()
       local hitnormal = net.ReadVector()
       local mattype = net.ReadInt( 32 )
-      weapon:ImpactEffectFunc( hitpos, hitnormal, mattype )
+      if weapon.ImpactEffectFunc then
+            weapon:ImpactEffectFunc( hitpos, hitnormal, mattype )
+      end
 end)
 
 net.Receive( "TFA_BALLISTICS_StopParticles", function ()
