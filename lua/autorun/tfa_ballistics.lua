@@ -1,7 +1,7 @@
 if SERVER then
       util.AddNetworkString( "TFA_BALLISTICS_DoImpact" )
       util.AddNetworkString( "TFA_BALLISTICS_AddBullet" )
-      util.AddNetworkString( "TFA_BALLISTICS_StopParticles" )
+      util.AddNetworkString( "TFA_BALLISTICS_SendWindSpeed" )
 end
 
 game.AddParticles( "particles/tfa_ballistics/dax_bullettrails.pcf" )
@@ -17,7 +17,54 @@ TFA_BALLISTICS = {}
 
 TFA_BALLISTICS.Bullets = {}
 
-TFA_BALLISTICS.Wind = Angle( 0, 0, 0 )
+if SERVER then
+      TFA_BALLISTICS.Wind = {}
+
+      TFA_BALLISTICS.Wind.P = math.Rand( 0, 360 )
+      TFA_BALLISTICS.Wind.Y = math.Rand( 0, 360 )
+      TFA_BALLISTICS.Wind.R = math.Rand( 0, 360 )
+
+      TFA_BALLISTICS.Wind = Angle( TFA_BALLISTICS.Wind.P, TFA_BALLISTICS.Wind.Y, TFA_BALLISTICS.Wind.R )
+      TFA_BALLISTICS.WindApproach = Angle( math.Rand( 0, 360 ), math.Rand( 0, 360 ), math.Rand( 0, 360 ))
+      TFA_BALLISTICS.WindDir = Vector(0, 0, 0)
+
+      TFA_BALLISTICS.WindSpeed = math.Rand( 0, 8 )
+      TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
+
+      function AngleToVector( self ) // Credit to TehBigA
+
+      	local x = math.cos( math.rad(self.y) )
+      	local y = math.sin( math.rad(self.y) )
+      	local z = -math.sin( math.rad(self.p) )
+      	return Vector( x, y, z )
+
+      end
+
+      TFA_BALLISTICS.WindSimulate = function()
+
+            if math.random( 1, 4000 ) == 250 then
+                  TFA_BALLISTICS.WindApproach = Angle( math.Rand( 0, 360 ), math.Rand( 0, 360 ), math.Rand( 0, 360 ) )
+                  print( "Wind Angle Changed" )
+            end
+            if math.random( 1, 500 ) == 195 then
+                  TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
+                  print("Wind Speed Changed")
+            end
+
+            TFA_BALLISTICS.WindSpeed = math.Approach( TFA_BALLISTICS.WindSpeed, TFA_BALLISTICS.WindSpeedApproach, 0.1 )
+
+            TFA_BALLISTICS.Wind.p = math.ApproachAngle( TFA_BALLISTICS.Wind.p, TFA_BALLISTICS.WindApproach.p, 0.1)
+            TFA_BALLISTICS.Wind.y = math.ApproachAngle( TFA_BALLISTICS.Wind.y, TFA_BALLISTICS.WindApproach.y, 0.1)
+            TFA_BALLISTICS.Wind.r = math.ApproachAngle( TFA_BALLISTICS.Wind.r, TFA_BALLISTICS.WindApproach.r, 0.1)
+            TFA_BALLISTICS.WindDir = AngleToVector( TFA_BALLISTICS.Wind )
+
+            net.Start( "TFA_BALLISTICS_SendWindSpeed", false)
+            net.WriteInt( TFA_BALLISTICS.WindSpeed, 32)
+            net.Broadcast()
+
+      end
+
+end
 
 TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos, dir, owner, ang, weapon)
 
@@ -45,13 +92,26 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos,
             table.insert( TFA_BALLISTICS.Bullets, bulletdata )
       end
 
-
 end
+
+hook.Add( "InitPostEntity", "TFA_BALLISTICS_SpawnWindIndicator", function()
+      if SERVER then
+            local winddirent = ents.Create( "tfa_wind_info" )
+            winddirent:SetPos( Vector( 0, 0, 0 ) )
+            winddirent:SetAngles( TFA_BALLISTICS.Wind )
+            winddirent:Spawn()
+      end
+      hook.Remove( "InitPostEntity", "TFA_BALLISTICS_SpawnWindIndicator" )
+end )
 
 hook.Add( "Tick", "TFA_BALLISTICS_Tick", function()
 
       for key, bullet in pairs( TFA_BALLISTICS.Bullets ) do
             TFA_BALLISTICS.Simulate( bullet )
+      end
+
+      if SERVER then
+            TFA_BALLISTICS.WindSimulate()
       end
 
 end)
@@ -181,7 +241,9 @@ TFA_BALLISTICS.Simulate = function( bullet )
 
       end
 
-      local bulletpos = bullet["pos"] + ( finalvelocity ) * FrameTime()
+      local windspeed = ( ( TFA_BALLISTICS.WindSpeed * 3.28084 * 12 / 0.75 ) * bullet["lifetime"] )
+
+      local bulletpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime()
 
       bullet["pos"] = bulletpos
 

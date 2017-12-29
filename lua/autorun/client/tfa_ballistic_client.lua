@@ -10,3 +10,8 @@ net.Receive( "TFA_BALLISTICS_StopParticles", function ()
       local ent = net.ReadEntity()
       ent:StopParticles()
 end)
+
+net.Receive( "TFA_BALLISTICS_SendWindSpeed", function ()
+      local windspeed = net.ReadInt( 32 )
+      TFA_BALLISTICS.WindSpeed = windspeed
+end)
