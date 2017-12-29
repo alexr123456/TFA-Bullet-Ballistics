@@ -1,5 +1,5 @@
 # TFA Bullet Ballistics
-This is currently not intended for players, if you are a developer please read below.
+This is currently not intended for players, if you are a developer please read [below](https://github.com/Daxble/TFA-Bullet-Ballistics#installationsetup).
 
 # FAQ
 Q. It doesn't seem like it's working up close?  
