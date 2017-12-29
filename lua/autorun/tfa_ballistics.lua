@@ -27,10 +27,10 @@ if SERVER then
       TFA_BALLISTICS.Wind = Angle( 0, TFA_BALLISTICS.Wind.Y, TFA_BALLISTICS.Wind.R )
       TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ))
 
-      TFA_BALLISTICS.WindSpeed = math.Rand( 0, 8 )
-      TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
+      TFA_BALLISTICS.WindSpeed = math.Rand( 0, 4 )
+      TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 4 )
 
-      function AngleToVector( self ) // Credit to TehBigA
+      local function AngleToVector( self ) // Credit to TehBigA
 
       	local x = math.cos( math.rad(self.y) )
       	local y = math.sin( math.rad(self.y) )
@@ -51,7 +51,7 @@ if SERVER then
                   end
             end
             if math.random( 1, 1500 ) == 195 then
-                  TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
+                  TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 4 )
                   print("Wind speed change")
             end
 
@@ -70,7 +70,7 @@ if SERVER then
 
 end
 
-TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos, dir, owner, ang, weapon)
+TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, owner, ang, weapon)
 
       if SERVER then
             local bulletent = ents.Create("tfa_ballistic_bullet")
@@ -81,7 +81,6 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos,
             local bulletdata = {
                   ["damage"] = damage,
                   ["velocity"] = velocity,
-                  ["aimcone"] = aimcone,
                   ["num_bullets"] = num_bullets,
                   ["pos"] = pos,
                   ["dir"] = dir,
@@ -92,6 +91,8 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, aimcone, num_bullets, pos,
                   ["ent"] = bulletent,
                   ["lifetime"] = 0
             }
+
+            print( bulletdata["damage"] )
 
             table.insert( TFA_BALLISTICS.Bullets, bulletdata )
       end
@@ -130,6 +131,8 @@ TFA_BALLISTICS.Simulate = function( bullet )
       end
 
       bullet["lifetime"] = bullet["lifetime"] + ( 0.1 * game.GetTimeScale() )
+
+      bullet["damage"] = bullet["damage"] * 0.985
 
       local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
       local grav_vec = Vector( 0, 0,GetConVarNumber("sv_gravity") )
@@ -239,6 +242,8 @@ TFA_BALLISTICS.Simulate = function( bullet )
                   net.WriteVector( bullet_trace.HitNormal )
                   net.WriteInt( bullet_trace.MatType, 32 )
             net.Broadcast()
+
+            print( bullet["damage"] )
 
             bullet["ent"]:StopParticles()
             timer.Simple( 0, function()
