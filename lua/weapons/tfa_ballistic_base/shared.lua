@@ -77,8 +77,6 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 		self:GetOwner():FireBullets(self.MainBullet)
 	end
 
-	print( self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) )
-
 end
 
 function SWEP:ImpactEffectFunc(pos, normal, mattype)

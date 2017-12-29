@@ -20,12 +20,12 @@ TFA_BALLISTICS.Bullets = {}
 if SERVER then
       TFA_BALLISTICS.Wind = {}
 
-      TFA_BALLISTICS.Wind.P = math.Rand( 0, 360 )
+      TFA_BALLISTICS.Wind.P = 0
       TFA_BALLISTICS.Wind.Y = math.Rand( 0, 360 )
       TFA_BALLISTICS.Wind.R = math.Rand( 0, 360 )
 
-      TFA_BALLISTICS.Wind = Angle( TFA_BALLISTICS.Wind.P, TFA_BALLISTICS.Wind.Y, TFA_BALLISTICS.Wind.R )
-      TFA_BALLISTICS.WindApproach = Angle( math.Rand( 0, 360 ), math.Rand( 0, 360 ), math.Rand( 0, 360 ))
+      TFA_BALLISTICS.Wind = Angle( 0, TFA_BALLISTICS.Wind.Y, TFA_BALLISTICS.Wind.R )
+      TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ))
       TFA_BALLISTICS.WindDir = Vector(0, 0, 0)
 
       TFA_BALLISTICS.WindSpeed = math.Rand( 0, 8 )
@@ -42,13 +42,11 @@ if SERVER then
 
       TFA_BALLISTICS.WindSimulate = function()
 
-            if math.random( 1, 4000 ) == 250 then
-                  TFA_BALLISTICS.WindApproach = Angle( math.Rand( 0, 360 ), math.Rand( 0, 360 ), math.Rand( 0, 360 ) )
-                  print( "Wind Angle Changed" )
+            if math.random( 1, 10000 ) == 250 then
+                  TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ) )
             end
-            if math.random( 1, 500 ) == 195 then
+            if math.random( 1, 1500 ) == 195 then
                   TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 8 )
-                  print("Wind Speed Changed")
             end
 
             TFA_BALLISTICS.WindSpeed = math.Approach( TFA_BALLISTICS.WindSpeed, TFA_BALLISTICS.WindSpeedApproach, 0.1 )
