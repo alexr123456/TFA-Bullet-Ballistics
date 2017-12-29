@@ -34,16 +34,16 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 
 # To Do
 1. Fix bugs ( Always in Progress )
-2. Add wind system ( Mostly Done )
+2. Add wind system ( Done )
 3. Proper bullet drop using verlet integration ( Done )
-4. Eötvös effect
-5. Spin Drift
+4. Eötvös effect ( Maybe )
+5. Spin Drift ( Maybe )
 
 # Bugs
-1. Aimcone doesn't do anything
-2. Firing at feet causes bullet to go through surface
+1. Aimcone doesn't do anything ( Fixed )
+2. Firing at feet causes bullet to go through surface ( Fixed )
 
-Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) issues if possible.
+Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) if possible.
 
 # Credits
 TFA - Helping with bullet drop and velocity code  
