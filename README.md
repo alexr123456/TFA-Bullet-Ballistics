@@ -33,8 +33,8 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 ```
 
 # To Do
-1. Fix bugs
-2. Add wind system
+1. Fix bugs ( Always in Progress )
+2. Add wind system ( In Progress )
 3. Proper bullet drop using verlet integration ( Done )
 4. Eötvös effect
 5. Spin Drift
