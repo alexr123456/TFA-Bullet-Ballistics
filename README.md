@@ -1,6 +1,16 @@
 # TFA Bullet Ballistics
 This is currently not intended for players, if you are a developer please read below.
 
+# FAQ
+Q. It doesn't seem like it's working up close?
+A. Hitscan bullets are used on shots less than 1000 source units ( ~19.5 Meters )
+
+Q. Why are the bullets so fast
+A. This aims to simulate real bullets, not Battlefield bullets.  
+**Kar98K: Muzzle velocity = 760m/s, 300m shot, distance/velocity = 0.39 seconds to hit**
+
+Q. Why isn't my weapon using the bullets?
+A. You need to do the setup for **Every** weapon that needs ballistics
 
 # Installation/Setup
 
@@ -21,7 +31,7 @@ SWEP.Primary.Velocity = 760 // Velocity in Meters
 # To Do
 1. Fix bugs
 2. Add wind system
-3. Proper bullet drop using verlet integration
+3. Proper bullet drop using verlet integration ( Done )
 4. Eötvös effect
 5. Spin Drift
 
