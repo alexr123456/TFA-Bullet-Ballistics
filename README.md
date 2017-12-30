@@ -2,7 +2,7 @@
 This is currently not intended for players, if you are a developer please read [below](https://github.com/Daxble/TFA-Bullet-Ballistics#installationsetup).
 
 # Info
-Shotguns will not work on this base, even if the weapon is set to use this it will not work on weapons that fire more than one bullet per shot.
+Shotguns will not work on this base, even if the weapon is set to use this it will not work on weapons that fire more than one bullet per shot. This is intended for medium/long range weaponry such as Rifles, DMRs, Snipers, ETC. Using this on shotguns/smgs is pointless because of the loss of damage.
 
 # FAQ
 Q. It doesn't seem like it's working up close?  
