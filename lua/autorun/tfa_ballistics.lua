@@ -6,16 +6,13 @@ PrecacheParticleSystem( "dax_bullettrail3" )
 PrecacheParticleSystem( "dax_bullettrail3_red" )
 PrecacheParticleSystem( "dax_bullettrail3_green" )
 
-if SERVER then
-      util.AddNetworkString( "TFA_BALLISTICS_DoImpact" )
-      util.AddNetworkString( "TFA_BALLISTICS_AddBullet" )
+TFA_BALLISTICS = {}
 
-      TFA_BALLISTICS = {}
+TFA_BALLISTICS.Bullets = {}
 
-      TFA_BALLISTICS.Bullets = {}
+TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weapon, tracereffect)
 
-      TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weapon, tracereffect)
-
+      if SERVER then
             local bulletent
 
             if tracereffect then
@@ -41,8 +38,13 @@ if SERVER then
             }
 
             table.insert( TFA_BALLISTICS.Bullets, bulletdata )
-
       end
+
+end
+
+if SERVER then
+      util.AddNetworkString( "TFA_BALLISTICS_DoImpact" )
+      util.AddNetworkString( "TFA_BALLISTICS_AddBullet" )
 
       hook.Add( "Tick", "TFA_BALLISTICS_Tick", function()
 
