@@ -7,13 +7,13 @@ This is currently not intended for players, if you are a developer please read [
 * All bullets calculated serverside
 * Bullet Drop
 * Scales with gravity ( Above 0 )
-* Wind
+* Wind ( If StormFox is installed )
 * Tracers
 * Bullet Cracks
 
 # FAQ
 Q. It doesn't seem like it's working up close?  
-A. Hitscan bullets are used on shots less than 1000 source units ( ~19.5 Meters )
+A. Hitscan bullets are used on shots less than 1000 source units ( ~19.5 Meters ), this prevents unnecessary strain on the server from close range gun fights.
 
 ___
 
@@ -45,7 +45,7 @@ SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrai
 
 # To Do
 1. Fix bugs ( Always in Progress )
-2. Add wind system ( Done )
+2. Add wind system ( Using StormFox )
 3. Proper bullet drop using verlet integration ( Done )
 4. Eötvös effect ( Maybe )
 5. Spin Drift ( Maybe )
