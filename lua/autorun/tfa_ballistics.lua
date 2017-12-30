@@ -63,14 +63,14 @@ if SERVER then
             local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
             local grav_vec = Vector( 0, 0, GetConVarNumber("sv_gravity") )
             local velocity = bullet["dir"] * sourcevelocity
-            local finalvelocity = ( velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2 )
+            local finalvelocity = ( velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2 ) * game.GetTimeScale()
 
             local windspeed
             local windangle
 
             // Wind
             if StormFox then
-                  windspeed = ( ( StormFox.GetNetworkData( "Wind" ) * 3.28084 * 12 / 0.95 ) * bullet["lifetime"] ) / 2
+                  windspeed = ( ( ( StormFox.GetNetworkData( "Wind" ) * 3.28084 * 12 / 0.95 ) * bullet["lifetime"] ) / 2 ) * game.GetTimeScale()
                   windangle = Angle( 0, StormFox.GetNetworkData( "WindAngle" ), 0 )
                   windangle:Normalize()
             else
