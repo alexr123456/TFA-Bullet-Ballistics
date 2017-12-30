@@ -28,10 +28,11 @@ A. You need to do the setup for **Every** weapon that needs ballistics
 
 # Server Owners
 
-1. Download the addon as a zip
-2. Extract the *TFA-Bullet-Ballistics-master* folder to your addons folder
+1. Download the addon as a zip  
+2. Extract the *TFA-Bullet-Ballistics-master* folder to your addons folder  
+3. Install [StormFox](https://steamcommunity.com/sharedfiles/filedetails/?id=1132466603) if you want wind to affect bullets  
 
-* **This is assuming you already have weapons that require this, if you do not please continue below.**
+* **This is assuming you already have weapons that require this, if you do not please continue below.**  
 
 # SWEP Developers
 
