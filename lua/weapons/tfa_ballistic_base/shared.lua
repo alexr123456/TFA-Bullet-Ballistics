@@ -22,7 +22,8 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 	num_bullets = num_bullets or 1
 	aimcone = aimcone or 0
 
-	if self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) >= 1000 then
+
+	//if self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) >= 1000 then
 		for i = 1, num_bullets do
 			local velocity = self:GetStat("Primary.Velocity")
 
@@ -40,6 +41,7 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
 			end
 		end
+	/*
 	else
 		if self.Tracer == 1 then
 			TracerName = "Ar2Tracer"
@@ -100,7 +102,7 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 
 		self:GetOwner():FireBullets(self.MainBullet)
 	end
-
+	*/
 end
 
 function SWEP:ImpactEffectFunc(pos, normal, mattype)

@@ -76,12 +76,11 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, own
             local bulletent
 
             if tracereffect then
-                  bulletent = ents.Create("info_particle_system")
+                  bulletent = ents.Create("tfa_ballistic_bullet")
                   bulletent:SetPos( pos )
-                  bulletent:SetKeyValue( "effect_name", tracereffect )
-                  bulletent:SetKeyValue( "start_active", "1")
+                  bulletent:SetAngles( ang )
+                  bulletent:SetOwner( owner )
                   bulletent:Spawn()
-                  bulletent:Activate()
             end
 
             local bulletdata = {
@@ -243,7 +242,7 @@ TFA_BALLISTICS.Simulate = function( bullet )
 
 		bullet["weapon"]:GetOwner():FireBullets( bullet["weapon"].MainBullet)
 
-            util.Decal( "ExplosiveGunshot", bullet_trace.HitPos + bullet_trace.HitNormal, bullet_trace.HitPos - bullet_trace.HitNormal)
+            util.Decal( MatTypeToDecal( bullet_trace.MatType ), bullet_trace.HitPos + bullet_trace.HitNormal, bullet_trace.HitPos - bullet_trace.HitNormal)
 
             net.Start( "TFA_BALLISTICS_DoImpact" )
                   net.WriteEntity( bullet["weapon"] )
@@ -270,4 +269,18 @@ TFA_BALLISTICS.Simulate = function( bullet )
             bullet["ent"]:SetPos( bullet["pos"] )
       end
 
+end
+
+local impacts = {
+      [MAT_METAL] = "Impact.Metal",
+      [MAT_SAND] = "Impact.Sand",
+      [MAT_WOOD] = "Impact.Wood",
+      [MAT_GLASS] = "Impact.Glass",
+      [MAT_ANTLION] = "Impact.Antlion",
+      [MAT_BLOODYFLESH] = "Impact.BloodyFlesh",
+      [MAT_FLESH] = "Blood"
+}
+
+function MatTypeToDecal( mattype )
+      return impacts[mattype] or "Impact.Concrete"
 end
