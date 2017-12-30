@@ -1,5 +1,5 @@
 # TFA Bullet Ballistics
-This is currently not intended for players, if you are a developer please read [below](https://github.com/Daxble/TFA-Bullet-Ballistics#installationsetup).
+**TFA Bullet Ballistics** is a full ballistics system in Garry's Mod for [TFA Base](https://steamcommunity.com/sharedfiles/filedetails/?id=415143062). Instead of firing hitscan bullets that require no skill at all, you can instead shoot bullets impacted by gravity, wind, temperature, spin drift, etc. I tried to optimize it as well as I could with my knowledge, all calculations regarding bullets are done serverside. If you would like a feature you can request it [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) or make it yourself and submit it [here](https://github.com/Daxble/TFA-Bullet-Ballistics/pulls).
 
 # Features
 
@@ -26,7 +26,14 @@ ___
 Q. Why isn't my weapon using the bullets?  
 A. You need to do the setup for **Every** weapon that needs ballistics
 
-# Installation/Setup
+# Server Owners
+
+1. Download the addon as a zip
+2. Extract the *TFA-Bullet-Ballistics-master* folder to your addons folder
+
+* **This is assuming you already have weapons that require this, if you do not please continue below.**
+
+# SWEP Developers
 
 1. Download the addon as a zip
 2. Extract the *TFA-Bullet-Ballistics-master* folder to your addons folder
@@ -39,9 +46,10 @@ SWEP.Base = "tfa_ballistic_base"
 ```
 4. Place the following lines somewhere in your weapon
 ```lua
-SWEP.Primary.Velocity = 760 // Velocity in Meters ( Defaults to 500 )
-SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrail2_red, dax_bullettrail2_green, dax_bullettrail3, dax_bullettrail3_red, dax_bullettrail3_green, nil to disable ( Defaults to dax_bullettrail3_green )
+SWEP.Primary.Velocity = 760 // Weapon's muzzle velocity in meters, change to whatever you would like. ( Defaults to 500 )
 ```
+
+That's all you have to do to get this up and running! Do not use on projectile based weapons such as grenades or rockets, they will just shoot bullets instead.
 
 # To Do
 1. Fix bugs ( Always in Progress )
@@ -51,16 +59,15 @@ SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrai
 5. Spin Drift ( Maybe )
 
 # Bugs
-1. Aimcone doesn't do anything ( Fixed :D )
-2. Firing at feet causes bullet to go through surface ( Fixed )
+* Non Currently
 
 Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) if possible.
 
 # Credits
 TFA - Helping with bullet drop and velocity code  
-Matsilagi - Particles and Workarounds  
-YuRaNnNzZZ - Extensive testing  
+YuRaNnNzZZ - Extensive testing and a lot help.  
 Kiwi, elwolf6, Amisaddai - FPS benchmarking  
+Matsilagi - Various help  
 Daxble - Coding this thing  
 
 # License
