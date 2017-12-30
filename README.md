@@ -1,8 +1,15 @@
 # TFA Bullet Ballistics
 This is currently not intended for players, if you are a developer please read [below](https://github.com/Daxble/TFA-Bullet-Ballistics#installationsetup).
 
-# Info
-Shotguns will not work on this base, even if the weapon is set to use this it will not work on weapons that fire more than one bullet per shot. This is intended for medium/long range weaponry such as Rifles, DMRs, Snipers, ETC. Using this on shotguns/smgs is pointless because of the loss of damage and lack of optics.
+# Features
+
+* Should work with all bullet based weapons
+* All bullets calculated serverside
+* Bullet Drop
+* Scales with gravity ( Above 0 )
+* Wind
+* Tracers
+* Bullet Cracks
 
 # FAQ
 Q. It doesn't seem like it's working up close?  
@@ -44,7 +51,7 @@ SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrai
 5. Spin Drift ( Maybe )
 
 # Bugs
-1. Aimcone doesn't do anything
+1. Aimcone doesn't do anything ( Fixed :D )
 2. Firing at feet causes bullet to go through surface ( Fixed )
 
 Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) if possible.
@@ -52,11 +59,13 @@ Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/
 # Credits
 TFA - Helping with bullet drop and velocity code  
 Matsilagi - Particles and Workarounds  
-Daxble - Everything else  
+YuRaNnNzZZ - Extensive testing  
+Kiwi, elwolf6, Amisaddai - FPS benchmarking  
+Daxble - Coding this thing  
 
 # License
 
-**TFA Bullet Ballistics is licensed under GNU General Public License v3.0**
+**TFA Bullet Ballistics is licensed under the GNU General Public License v3.0**
 
 | **Can**  | **Cannot** | **Must** |
 | ------------- | ------------- | ------------- |
