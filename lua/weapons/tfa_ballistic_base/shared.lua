@@ -9,7 +9,7 @@ local TracerName
 local cv_forcemult = GetConVar("sv_tfa_force_multiplier")
 
 function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet, bulletoverride)
-	if not IsFirstTimePredicted() and not game.SinglePlayer() then return end
+	if not IsFirstTimePredicted() and not game.SinglePlayer() and not CLIENT then return end
 	num_bullets = num_bullets or 1
 	aimcone = aimcone or 0
 

@@ -12,16 +12,6 @@ if SERVER then
 
       TFA_BALLISTICS = {}
 
-      TFA_BALLISTICS.WindEnabled = function()
-            for k, v in pairs( engine.GetAddons() ) do
-                  if v.wsid == "1132466603" and v.mounted then
-                        return true
-                  else
-                        return false
-                  end
-            end
-      end
-
       TFA_BALLISTICS.Bullets = {}
 
       TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weapon, tracereffect)
@@ -85,7 +75,7 @@ if SERVER then
             local windangle
 
             // Wind
-            if TFA_BALLISTICS.WindEnabled() then
+            if StormFox then
                   windspeed = ( ( StormFox.GetNetworkData( "Wind" ) * 3.28084 * 12 / 0.95 ) * bullet["lifetime"] ) / 2
                   windangle = Angle( 0, StormFox.GetNetworkData( "WindAngle" ), 0 )
                   windangle:Normalize()
