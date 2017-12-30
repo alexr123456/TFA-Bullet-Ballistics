@@ -3,7 +3,6 @@ include('shared.lua')
 ENT.CanEmitSound = true
 
 function ENT:Initialize()
-      ParticleEffectAttach( "dax_bullettrail3_red", PATTACH_ABSORIGIN_FOLLOW, self, 1)
       self.Initialized = true
       self.CanEmitSound = true
       self:SetBodyGroups( "010" )

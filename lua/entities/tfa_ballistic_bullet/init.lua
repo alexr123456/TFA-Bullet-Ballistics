@@ -10,4 +10,8 @@ function ENT:Initialize()
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_NONE )
 
+	timer.Simple( 0.01, function()
+		util.SpriteTrail( self, 1, Color(255, 152, 43), false, 1, 1, 0.001, 1, "trails/smoke.vmt")
+	end )
+
 end

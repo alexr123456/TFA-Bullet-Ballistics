@@ -1,11 +1,3 @@
-game.AddParticles( "particles/tfa_ballistics/dax_bullettrails.pcf" )
-PrecacheParticleSystem( "dax_bullettrail2" )
-PrecacheParticleSystem( "dax_bullettrail2_red" )
-PrecacheParticleSystem( "dax_bullettrail2_green" )
-PrecacheParticleSystem( "dax_bullettrail3" )
-PrecacheParticleSystem( "dax_bullettrail3_red" )
-PrecacheParticleSystem( "dax_bullettrail3_green" )
-
 TFA_BALLISTICS = {}
 
 TFA_BALLISTICS.Bullets = {}
