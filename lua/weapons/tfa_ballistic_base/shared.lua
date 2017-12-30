@@ -8,40 +8,23 @@ SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrai
 local TracerName
 local cv_forcemult = GetConVar("sv_tfa_force_multiplier")
 
-local function AngleToVector( self ) // Credit to TehBigA
-
-	local x = math.cos( math.rad(self.y) )
-	local y = math.sin( math.rad(self.y) )
-	local z = -math.sin( math.rad(self.p) )
-	return Vector( x, y, z )
-
-end
-
 function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet, bulletoverride)
 	if not IsFirstTimePredicted() and not game.SinglePlayer() then return end
 	num_bullets = num_bullets or 1
 	aimcone = aimcone or 0
 
 
-	//if self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) >= 1000 then
+	if self.Owner:GetShootPos():Distance( self.Owner:GetEyeTrace().HitPos ) >= 1000 then
 		for i = 1, num_bullets do
 			local velocity = self:GetStat("Primary.Velocity")
 
-			local direction = self.Owner:EyeAngles()
-			direction:RotateAroundAxis(direction:Right(), ( -aimcone / 2 + math.Rand(0, aimcone) ) * 50)
-			direction:RotateAroundAxis(direction:Up(), ( -aimcone / 2 + math.Rand(0, aimcone) ) * 50)
+			local angles = self.Owner:EyeAngles()
 
-			local finaldir = AngleToVector( direction )
+			angles:RotateAroundAxis( angles:Right(), ( -aimcone / 2 + math.Rand(0, aimcone) ) * 90)
+			angles:RotateAroundAxis( angles:Up(), ( -aimcone / 2 + math.Rand(0, aimcone) ) * 90)
 
-			if not self:GetIronSights() then
-				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
-			elseif num_bullets == 1 then
-				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), self.Owner:GetAimVector(), self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
-			else
-				TFA_BALLISTICS.AddBullet( damage, velocity, num_bullets, self.Owner:EyePos(), finaldir, self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
-			end
+			TFA_BALLISTICS.AddBullet( damage, velocity, self.Owner:EyePos(), angles:Forward(), self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
 		end
-	/*
 	else
 		if self.Tracer == 1 then
 			TracerName = "Ar2Tracer"
@@ -102,7 +85,6 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 
 		self:GetOwner():FireBullets(self.MainBullet)
 	end
-	*/
 end
 
 function SWEP:ImpactEffectFunc(pos, normal, mattype)

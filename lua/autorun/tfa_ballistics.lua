@@ -1,11 +1,4 @@
-if SERVER then
-      util.AddNetworkString( "TFA_BALLISTICS_DoImpact" )
-      util.AddNetworkString( "TFA_BALLISTICS_AddBullet" )
-      util.AddNetworkString( "TFA_BALLISTICS_SendWindSpeed" )
-end
-
 game.AddParticles( "particles/tfa_ballistics/dax_bullettrails.pcf" )
-
 PrecacheParticleSystem( "dax_bullettrail2" )
 PrecacheParticleSystem( "dax_bullettrail2_red" )
 PrecacheParticleSystem( "dax_bullettrail2_green" )
@@ -13,66 +6,26 @@ PrecacheParticleSystem( "dax_bullettrail3" )
 PrecacheParticleSystem( "dax_bullettrail3_red" )
 PrecacheParticleSystem( "dax_bullettrail3_green" )
 
-TFA_BALLISTICS = {}
-
-TFA_BALLISTICS.Bullets = {}
-
 if SERVER then
-      TFA_BALLISTICS.Wind = {}
+      util.AddNetworkString( "TFA_BALLISTICS_DoImpact" )
+      util.AddNetworkString( "TFA_BALLISTICS_AddBullet" )
 
-      TFA_BALLISTICS.Wind.P = 0
-      TFA_BALLISTICS.Wind.Y = math.Rand( 0, 360 )
-      TFA_BALLISTICS.Wind.R = math.Rand( 0, 360 )
+      TFA_BALLISTICS = {}
 
-      TFA_BALLISTICS.Wind = Angle( 0, TFA_BALLISTICS.Wind.Y, TFA_BALLISTICS.Wind.R )
-      TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ))
-
-      TFA_BALLISTICS.WindSpeed = math.Rand( 0, 4 )
-      TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 4 )
-
-      local function AngleToVector( self ) // Credit to TehBigA
-
-      	local x = math.cos( math.rad(self.y) )
-      	local y = math.sin( math.rad(self.y) )
-      	local z = -math.sin( math.rad(self.p) )
-      	return Vector( x, y, z )
-
-      end
-
-      TFA_BALLISTICS.WindSimulate = function()
-
-            if math.random( 1, 10000 ) == 250 then
-                  TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( 0, 360 ), math.Rand( 0, 360 ) )
-                  print("Major wind direction shift")
-            else
-                  if math.random(1, 750) == 50 then
-                        TFA_BALLISTICS.WindApproach = Angle( 0, math.Rand( TFA_BALLISTICS.WindApproach.y - 5, TFA_BALLISTICS.WindApproach.y + 5), math.Rand( TFA_BALLISTICS.WindApproach.r - 5, TFA_BALLISTICS.WindApproach.r + 5) )
-                        print("Slight wind direction shift")
+      TFA_BALLISTICS.WindEnabled = function()
+            for k, v in pairs( engine.GetAddons() ) do
+                  if v.wsid == "1132466603" and v.mounted then
+                        return true
+                  else
+                        return false
                   end
             end
-            if math.random( 1, 1500 ) == 195 then
-                  TFA_BALLISTICS.WindSpeedApproach = math.Rand( 0, 4 )
-                  print("Wind speed change")
-            end
-
-            TFA_BALLISTICS.WindSpeed = math.Approach( TFA_BALLISTICS.WindSpeed, TFA_BALLISTICS.WindSpeedApproach, FrameTime() )
-
-            TFA_BALLISTICS.Wind.p = math.ApproachAngle( TFA_BALLISTICS.Wind.p, TFA_BALLISTICS.WindApproach.p, FrameTime())
-            TFA_BALLISTICS.Wind.y = math.ApproachAngle( TFA_BALLISTICS.Wind.y, TFA_BALLISTICS.WindApproach.y, FrameTime())
-            TFA_BALLISTICS.Wind.r = math.ApproachAngle( TFA_BALLISTICS.Wind.r, TFA_BALLISTICS.WindApproach.r, FrameTime())
-            TFA_BALLISTICS.WindDir = AngleToVector( TFA_BALLISTICS.Wind )
-
-            net.Start( "TFA_BALLISTICS_SendWindSpeed", false)
-            net.WriteInt( TFA_BALLISTICS.WindSpeed, 32)
-            net.Broadcast()
-
       end
 
-end
+      TFA_BALLISTICS.Bullets = {}
 
-TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, owner, ang, weapon, tracereffect)
+      TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weapon, tracereffect)
 
-      if SERVER then
             local bulletent
 
             if tracereffect then
@@ -86,201 +39,212 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, num_bullets, pos, dir, own
             local bulletdata = {
                   ["damage"] = damage,
                   ["velocity"] = velocity,
-                  ["num_bullets"] = num_bullets,
                   ["pos"] = pos,
                   ["dir"] = dir,
                   ["owner"] = owner,
                   ["ang"] = ang,
                   ["weapon"] = weapon,
-                  ["dropamount"] = 0,
                   ["ent"] = bulletent,
-                  ["lifetime"] = 0,
-                  ["tracer"] = tracereffect
+                  ["tracer"] = tracereffect,
+                  ["dropamount"] = 0,
+                  ["lifetime"] = 0
             }
 
             table.insert( TFA_BALLISTICS.Bullets, bulletdata )
+
       end
 
-end
+      hook.Add( "Tick", "TFA_BALLISTICS_Tick", function()
 
-hook.Add( "InitPostEntity", "TFA_BALLISTICS_SpawnWindIndicator", function()
-      if SERVER then
-            local winddirent = ents.Create( "tfa_wind_info" )
-            winddirent:SetPos( Vector( 0, 0, 0 ) )
-            winddirent:SetAngles( TFA_BALLISTICS.Wind )
-            winddirent:Spawn()
+            for key, bullet in pairs( TFA_BALLISTICS.Bullets ) do
+                  TFA_BALLISTICS.Simulate( bullet )
+            end
+
+      end)
+
+      TFA_BALLISTICS.Simulate = function( bullet )
+
+            if not IsFirstTimePredicted() then return end
+
+            if not IsValid( bullet["weapon"] ) then
+                  table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
+                  return false
+            end
+
+            bullet["lifetime"] = bullet["lifetime"] + ( 0.1 * game.GetTimeScale() )
+
+            bullet["damage"] = bullet["damage"] * 0.9875
+
+            // Velocity
+            local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
+            local grav_vec = Vector( 0, 0, GetConVarNumber("sv_gravity") )
+            local velocity = bullet["dir"] * sourcevelocity
+            local finalvelocity = ( velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2 )
+
+            local windspeed
+            local windangle
+
+            // Wind
+            if TFA_BALLISTICS.WindEnabled() then
+                  windspeed = ( ( StormFox.GetNetworkData( "Wind" ) * 3.28084 * 12 / 0.95 ) * bullet["lifetime"] ) / 2
+                  windangle = Angle( 0, StormFox.GetNetworkData( "WindAngle" ), 0 )
+                  windangle:Normalize()
+            else
+                  windspeed = 0
+                  windangle = Angle( 0, 0, 0 )
+            end
+
+            // Final Pos
+            local finalpos = bullet["pos"] + ( finalvelocity - ( windangle:Forward() * windspeed ) ) * FrameTime()
+
+            local bullet_trace = util.TraceLine( {
+            	start = bullet["pos"],
+                  endpos = finalpos
+            } )
+            local water_trace = util.TraceLine( {
+            	start = bullet["pos"],
+                  endpos = finalpos,
+                  mask = MASK_WATER }
+            )
+
+            if water_trace.Hit then
+
+                  BallisticsFireBullet( bullet, water_trace.HitPos, water_trace.HitNormal, water_trace.MatType )
+
+            elseif bullet_trace.Hit and bullet_trace.Entity != bullet["owner"] then
+
+                  BallisticsFireBullet( bullet, bullet_trace.HitPos, bullet_trace.HitNormal, bullet_trace.MatType )
+
+            end
+
+            bullet["pos"] = finalpos
+
+            if IsValid( bullet["ent"] ) then
+                  bullet["ent"]:SetPos( bullet["pos"] )
+                  bullet["ent"]:SetAngles( finalvelocity:Angle() )
+            end
+
       end
-      hook.Remove( "InitPostEntity", "TFA_BALLISTICS_SpawnWindIndicator" )
-end )
 
-hook.Add( "Tick", "TFA_BALLISTICS_Tick", function()
+      local impacts = {
+            [MAT_METAL] = "Impact.Metal",
+            [MAT_SAND] = "Impact.Sand",
+            [MAT_WOOD] = "Impact.Wood",
+            [MAT_GLASS] = "Impact.Glass",
+            [MAT_ANTLION] = "Impact.Antlion",
+            [MAT_BLOODYFLESH] = "Impact.BloodyFlesh",
+            [MAT_FLESH] = "Blood"
+      }
 
-      for key, bullet in pairs( TFA_BALLISTICS.Bullets ) do
-            TFA_BALLISTICS.Simulate( bullet )
+      function MatTypeToDecal( mattype )
+            return impacts[mattype] or "Impact.Concrete"
       end
 
-      if SERVER then
-            TFA_BALLISTICS.WindSimulate()
-      end
+      function BallisticsFireBullet( bullet, hitpos, hitnormal, mattype )
 
-end)
-
-TFA_BALLISTICS.Simulate = function( bullet )
-
-      if not IsFirstTimePredicted() then return end
-
-      if not IsValid( bullet["weapon"] ) then
-            table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
-            return false
-      end
-
-      bullet["lifetime"] = bullet["lifetime"] + ( 0.1 * game.GetTimeScale() )
-
-      local sourcevelocity = ( bullet["velocity"] * 3.28084 * 12 / 0.75 )
-      local grav_vec = Vector( 0, 0,GetConVarNumber("sv_gravity") )
-      local velocity = bullet["dir"] * sourcevelocity
-      local finalvelocity = velocity - ( (grav_vec * 3.28084 * 12) * bullet["lifetime"] ) * FrameTime() / 2
-      local windspeed = ( ( TFA_BALLISTICS.WindSpeed * 3.28084 * 12 / 0.75 ) * bullet["lifetime"] )
-
-      if IsValid( bullet["ent"] ) then
-            bullet["ent"]:SetAngles( finalvelocity:Angle() )
-      end
-
-      local bullet_trace = util.TraceLine( {
-      	start = bullet["pos"],
-            endpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime() }
-      )
-      local water_trace = util.TraceLine( {
-      	start = bullet["pos"],
-            endpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime(),
-            mask = MASK_WATER }
-      )
-
-      if water_trace.Hit then
             bullet["weapon"].MainBullet.Attacker = bullet["owner"]
-		bullet["weapon"].MainBullet.Inflictor = bullet["weapon"]
-		bullet["weapon"].MainBullet.Num = 1
-		bullet["weapon"].MainBullet.Src = water_trace.HitPos
-		bullet["weapon"].MainBullet.Dir = bullet["ang"]:Forward()
-		bullet["weapon"].MainBullet.HullSize = 1
-		bullet["weapon"].MainBullet.Spread.x = 0
-		bullet["weapon"].MainBullet.Spread.y = 0
-		bullet["weapon"].MainBullet.PenetrationCount = 0
-		bullet["weapon"].MainBullet.AmmoType = bullet["weapon"]:GetPrimaryAmmoType()
-		bullet["weapon"].MainBullet.Force = bullet["weapon"]:GetStat("Primary.Damage") / 6 * math.sqrt( bullet["weapon"]:GetStat("Primary.KickUp") + bullet["weapon"]:GetStat("Primary.KickDown") + bullet["weapon"]:GetStat("Primary.KickHorizontal")) * 1 * bullet["weapon"]:GetAmmoForceMultiplier()
-		bullet["weapon"].MainBullet.Damage = bullet["damage"]
-		bullet["weapon"].MainBullet.HasAppliedRange = false
-		bullet["weapon"].MainBullet.TracerName = ""
+            bullet["weapon"].MainBullet.Inflictor = bullet["weapon"]
+            bullet["weapon"].MainBullet.Num = 1
+            bullet["weapon"].MainBullet.Src = hitpos
+            bullet["weapon"].MainBullet.Dir = bullet["ang"]:Forward()
+            bullet["weapon"].MainBullet.HullSize = 1
+            bullet["weapon"].MainBullet.Spread.x = 0
+            bullet["weapon"].MainBullet.Spread.y = 0
+            bullet["weapon"].MainBullet.PenetrationCount = 0
+            bullet["weapon"].MainBullet.AmmoType = bullet["weapon"]:GetPrimaryAmmoType()
+            bullet["weapon"].MainBullet.Force = bullet["weapon"]:GetStat("Primary.Damage") / 6 * math.sqrt( bullet["weapon"]:GetStat("Primary.KickUp") + bullet["weapon"]:GetStat("Primary.KickDown") + bullet["weapon"]:GetStat("Primary.KickHorizontal")) * 1 * bullet["weapon"]:GetAmmoForceMultiplier()
+            bullet["weapon"].MainBullet.Damage = bullet["damage"]
+            bullet["weapon"].MainBullet.HasAppliedRange = false
+            bullet["weapon"].MainBullet.TracerName = ""
 
-		if bullet["weapon"].CustomBulletCallback then
-			bullet["weapon"].MainBullet.Callback2 = bullet["weapon"].CustomBulletCallback
-		end
+            if bullet["weapon"].CustomBulletCallback then
+                  bullet["weapon"].MainBullet.Callback2 = bullet["weapon"].CustomBulletCallback
+            end
 
-		bullet["weapon"].MainBullet.Callback = function(a, b, c)
-			if IsValid( bullet["weapon"] ) then
-				c:SetInflictor(bullet["weapon"])
-				if bullet["weapon"].MainBullet.Callback2 then
-					bullet["weapon"].MainBullet.Callback2(a, b, c)
-				end
+            bullet["weapon"].MainBullet.Callback = function(a, b, c)
+                  if IsValid( bullet["weapon"] ) then
+                        c:SetInflictor(bullet["weapon"])
+                        if bullet["weapon"].MainBullet.Callback2 then
+                              bullet["weapon"].MainBullet.Callback2(a, b, c)
+                        end
 
-				bullet["weapon"].MainBullet:Penetrate(a, b, c, bullet["weapon"])
-			end
-		end
+                        bullet["weapon"].MainBullet:Penetrate(a, b, c, bullet["weapon"])
+                  end
+            end
 
-		bullet["weapon"]:GetOwner():FireBullets( bullet["weapon"].MainBullet)
+            bullet["weapon"]:GetOwner():FireBullets( bullet["weapon"].MainBullet)
 
-            util.Decal("ExplosiveGunshot", water_trace.HitPos + water_trace.HitNormal, water_trace.HitPos - water_trace.HitNormal)
+            util.Decal( MatTypeToDecal( mattype ), hitpos + hitnormal, hitpos - hitnormal)
 
             net.Start( "TFA_BALLISTICS_DoImpact" )
                   net.WriteEntity( bullet["weapon"] )
-                  net.WriteVector( water_trace.HitPos )
-                  net.WriteVector( water_trace.HitNormal )
-                  net.WriteInt( water_trace.MatType, 32 )
+                  net.WriteVector( hitpos )
+                  net.WriteVector( hitnormal )
+                  net.WriteInt( mattype, 32 )
             net.Broadcast()
 
             if IsValid( bullet["ent"] ) then
                   bullet["ent"]:StopParticles()
                   SafeRemoveEntity( bullet["ent"] )
             end
+
             timer.Simple( 0, function()
                   table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
             end )
 
       end
+else
+      local function genOrderedTbl(str, min, max)
+      	if not min then min = 1 end
+      	if not max then
+      		max = min
+      		min = 1
+      	end
+      	local tbl = {}
+      	for i=min, max do
+      		table.insert(tbl, str:format(i))
+      	end
+      	return tbl
+      end
 
-      if bullet_trace.Hit and bullet_trace.Entity != bullet["owner"] then
+      local subsonicsounds = genOrderedTbl("ballistics/subsonic/%i.wav", 27)
+      local supersonicsounds = genOrderedTbl("ballistics/supersonic/%i.wav", 12)
 
-		bullet["weapon"].MainBullet.Attacker = bullet["owner"]
-		bullet["weapon"].MainBullet.Inflictor = bullet["weapon"]
-		bullet["weapon"].MainBullet.Num = 1
-		bullet["weapon"].MainBullet.Src = bullet_trace.HitPos
-		bullet["weapon"].MainBullet.Dir = bullet["ang"]:Forward()
-		bullet["weapon"].MainBullet.HullSize = 1
-		bullet["weapon"].MainBullet.Spread.x = 0
-		bullet["weapon"].MainBullet.Spread.y = 0
-		bullet["weapon"].MainBullet.PenetrationCount = 0
-		bullet["weapon"].MainBullet.AmmoType = bullet["weapon"]:GetPrimaryAmmoType()
-		bullet["weapon"].MainBullet.Force = bullet["weapon"]:GetStat("Primary.Damage") / 6 * math.sqrt( bullet["weapon"]:GetStat("Primary.KickUp") + bullet["weapon"]:GetStat("Primary.KickDown") + bullet["weapon"]:GetStat("Primary.KickHorizontal")) * 1 * bullet["weapon"]:GetAmmoForceMultiplier()
-		bullet["weapon"].MainBullet.Damage = bullet["damage"]
-		bullet["weapon"].MainBullet.HasAppliedRange = false
-		bullet["weapon"].MainBullet.TracerName = ""
+      sound.Add( {
+      	name = "TFA_BALLISTICS.Subsonic",
+      	channel = CHAN_AUTO,
+      	volume = 1.0,
+      	level = 100,
+      	pitch = { 95, 110 },
+      	sound = subsonicsounds
+      } )
 
-		if bullet["weapon"].CustomBulletCallback then
-			bullet["weapon"].MainBullet.Callback2 = bullet["weapon"].CustomBulletCallback
-		end
+      sound.Add( {
+      	name = "TFA_BALLISTICS.Supersonic",
+      	channel = CHAN_AUTO,
+      	volume = 1.0,
+      	level = 100,
+      	pitch = { 95, 110 },
+      	sound = supersonicsounds
+      } )
 
-		bullet["weapon"].MainBullet.Callback = function(a, b, c)
-			if IsValid( bullet["weapon"] ) then
-				c:SetInflictor(bullet["weapon"])
-				if bullet["weapon"].MainBullet.Callback2 then
-					bullet["weapon"].MainBullet.Callback2(a, b, c)
-				end
-
-				bullet["weapon"].MainBullet:Penetrate(a, b, c, bullet["weapon"])
-			end
-		end
-
-		bullet["weapon"]:GetOwner():FireBullets( bullet["weapon"].MainBullet)
-
-            util.Decal( MatTypeToDecal( bullet_trace.MatType ), bullet_trace.HitPos + bullet_trace.HitNormal, bullet_trace.HitPos - bullet_trace.HitNormal)
-
-            net.Start( "TFA_BALLISTICS_DoImpact" )
-                  net.WriteEntity( bullet["weapon"] )
-                  net.WriteVector( bullet_trace.HitPos )
-                  net.WriteVector( bullet_trace.HitNormal )
-                  net.WriteInt( bullet_trace.MatType, 32 )
-            net.Broadcast()
-
-            if IsValid( bullet["ent"] ) then
-                  bullet["ent"]:StopParticles()
-                  SafeRemoveEntity( bullet["ent"] )
+      net.Receive( "TFA_BALLISTICS_DoImpact", function ()
+            local weapon = net.ReadEntity()
+            local hitpos = net.ReadVector()
+            local hitnormal = net.ReadVector()
+            local mattype = net.ReadInt( 32 )
+            if weapon.ImpactEffectFunc then
+                  weapon:ImpactEffectFunc( hitpos, hitnormal, mattype )
             end
-            timer.Simple( 0, function()
-                  table.RemoveByValue( TFA_BALLISTICS.Bullets, bullet )
-            end )
+      end)
 
-      end
+      net.Receive( "TFA_BALLISTICS_StopParticles", function ()
+            local ent = net.ReadEntity()
+            ent:StopParticles()
+      end)
 
-      local bulletpos = bullet["pos"] + ( finalvelocity + ( TFA_BALLISTICS.WindDir * windspeed ) ) * FrameTime()
-
-      bullet["pos"] = bulletpos
-
-      if IsValid( bullet["ent"] ) then
-            bullet["ent"]:SetPos( bullet["pos"] )
-      end
-
-end
-
-local impacts = {
-      [MAT_METAL] = "Impact.Metal",
-      [MAT_SAND] = "Impact.Sand",
-      [MAT_WOOD] = "Impact.Wood",
-      [MAT_GLASS] = "Impact.Glass",
-      [MAT_ANTLION] = "Impact.Antlion",
-      [MAT_BLOODYFLESH] = "Impact.BloodyFlesh",
-      [MAT_FLESH] = "Blood"
-}
-
-function MatTypeToDecal( mattype )
-      return impacts[mattype] or "Impact.Concrete"
+      net.Receive( "TFA_BALLISTICS_SendWindSpeed", function ()
+            local windspeed = net.ReadInt( 32 )
+            TFA_BALLISTICS.WindSpeed = windspeed
+      end)
 end

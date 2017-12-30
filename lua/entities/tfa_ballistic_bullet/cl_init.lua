@@ -27,5 +27,5 @@ function ENT:Think()
                   self.CanEmitSound = false
             end )
       end
-      
+
 end
