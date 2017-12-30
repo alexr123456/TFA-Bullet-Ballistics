@@ -1,6 +1,9 @@
 # TFA Bullet Ballistics
 This is currently not intended for players, if you are a developer please read [below](https://github.com/Daxble/TFA-Bullet-Ballistics#installationsetup).
 
+# Info
+Shotguns will not work on this base, even if the weapon is set to use this it will not work on weapons that fire more than one bullet per shot.
+
 # FAQ
 Q. It doesn't seem like it's working up close?  
 A. Hitscan bullets are used on shots less than 1000 source units ( ~19.5 Meters )
@@ -41,7 +44,7 @@ SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrai
 5. Spin Drift ( Maybe )
 
 # Bugs
-1. Aimcone doesn't do anything ( Fixed )
+1. Aimcone doesn't do anything
 2. Firing at feet causes bullet to go through surface ( Fixed )
 
 Please report other bugs [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) if possible.
