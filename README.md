@@ -49,6 +49,7 @@ SWEP.Base = "tfa_ballistic_base"
 4. Place the following lines somewhere in your weapon
 ```lua
 SWEP.Primary.Velocity = 760 // Weapon's muzzle velocity in meters, change to whatever you would like. ( Defaults to 500 )
+SWEP.TracerColor = Color( 255, 0, 0, 255 ) // Choose whatever color you would like, set alpha to zero to disable. ( Shotguns shouldn't have tracers ever. )
 ```
 
 That's all you have to do to get this up and running! Do not use on projectile based weapons such as grenades or rockets, they will just shoot bullets instead.
