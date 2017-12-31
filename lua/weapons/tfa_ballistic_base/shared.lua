@@ -128,6 +128,8 @@ end
 function SWEP:DoImpactEffect()
 end
 
+local whitemat
+
 if CLIENT then
 	local cos, sin, abs, max, rad1, log, pow = math.cos, math.sin, math.abs, math.max, math.rad, math.log, math.pow
       local surface = surface
@@ -202,27 +204,36 @@ if CLIENT then
       	surface.DrawPoly( cir )
       end
 
+	whitemat = Material( "hud/white" )
+
 end
 
 function SWEP:DrawHUD()
 	BaseClass.DrawHUD( self )
 
-	surface.SetDrawColor( 26, 26, 26, 150 )
-	draw.Circle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.02, 30 )
+	if StormFox then
+		draw.NoTexture()
 
-	surface.SetDrawColor( 26, 26, 26, 200 )
-	draw.Circle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.016, 30 )
+		surface.SetDrawColor( 26, 26, 26, 150 )
+		draw.Circle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.02, 30 )
 
-	startAng = ( StormFox.GetNetworkData( "WindAngle" ) + ( LocalPlayer():GetAngles().y * -1 ) ) - ( StormFox.GetNetworkData( "Wind" ) )
-	endAng = ( StormFox.GetNetworkData( "WindAngle" ) + ( LocalPlayer():GetAngles().y * -1 ) ) + ( StormFox.GetNetworkData( "Wind" ) )
+		surface.SetDrawColor( 26, 26, 26, 200 )
+		draw.Circle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.016, 30 )
 
-	surface.DrawCircle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ) , ScrW() * 0.0196, 26, 26, 26, 200)
+		startAng = ( StormFox.GetNetworkData( "WindAngle" ) + ( LocalPlayer():GetAngles().y * -1 ) ) - ( StormFox.GetNetworkData( "Wind" ) )
+		endAng = ( StormFox.GetNetworkData( "WindAngle" ) + ( LocalPlayer():GetAngles().y * -1 ) ) + ( StormFox.GetNetworkData( "Wind" ) )
 
-	draw.Arc( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.02, ScrW() * 0.004, startAng, endAng, 1, Color(225, 225, 225) )
+		surface.DrawCircle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ) , ScrW() * 0.0196, 26, 26, 26, 200)
 
-	surface.SetFont( "TFA_BALLISTICS_Font" )
-	surface.SetTextColor( 225, 225, 225 )
-	local width, height = surface.GetTextSize( math.Round( StormFox.GetNetworkData( "Wind" ) ) )
-	surface.SetTextPos( ( ScrW() / 2 ) - ( width / 2 ), ( ScrH() - ( ScrW() * 0.02 ) ) - ( height / 2 ) )
-	surface.DrawText( math.Round( StormFox.GetNetworkData( "Wind" ) ) )
+		surface.SetFont( "TFA_BALLISTICS_Font" )
+		surface.SetTextColor( 225, 225, 225 )
+		local width, height = surface.GetTextSize( math.Round( StormFox.GetNetworkData( "Wind" ) ) )
+		surface.SetTextPos( ( ScrW() / 2 ) - ( width / 2 ), ( ScrH() - ( ScrW() * 0.02 ) ) - ( height / 2 ) )
+		surface.DrawText( math.Round( StormFox.GetNetworkData( "Wind" ) ) )
+
+		render.SetMaterial( whitemat )
+		surface.SetMaterial( whitemat )
+
+		draw.Arc( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.02, ScrW() * 0.004, startAng, endAng, 1, Color(225, 225, 225) )
+	end
 end

@@ -235,7 +235,7 @@ else
       surface.CreateFont( "TFA_BALLISTICS_Font", {
       	font = "Roboto Condensed",
       	extended = false,
-      	size = ScreenScale( 7 ),
+      	size = ScreenScale( 11 ),
       	weight = 500,
       	blursize = 0,
       	scanlines = 0,
