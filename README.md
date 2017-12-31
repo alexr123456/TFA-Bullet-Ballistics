@@ -1,5 +1,5 @@
 # TFA Bullet Ballistics
-**TFA Bullet Ballistics** is a full ballistics system in Garry's Mod for [TFA Base](https://steamcommunity.com/sharedfiles/filedetails/?id=415143062). Instead of firing hitscan bullets that require no skill at all, you can instead shoot bullets impacted by gravity, wind, temperature, spin drift, etc. I tried to optimize it as well as I could with my knowledge, all calculations regarding bullets are done serverside. If you would like a feature you can request it [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) or make it yourself and submit it [here](https://github.com/Daxble/TFA-Bullet-Ballistics/pulls).
+**TFA Bullet Ballistics** is a full ballistics system in Garry's Mod for [TFA Base](https://steamcommunity.com/sharedfiles/filedetails/?id=415143062). Instead of firing hitscan bullets that require no skill at all, you can instead shoot bullets impacted by gravity, etc. I tried to optimize it as well as I could with my knowledge, all calculations regarding bullets are done serverside. If you would like a feature you can request it [here](https://github.com/Daxble/TFA-Bullet-Ballistics/issues) or make it yourself and submit it [here](https://github.com/Daxble/TFA-Bullet-Ballistics/pulls).
 
 # Features
 
@@ -58,8 +58,6 @@ That's all you have to do to get this up and running! Do not use on projectile b
 1. Fix bugs ( Always in Progress )
 2. Add wind system ( Using StormFox )
 3. Proper bullet drop using verlet integration ( Done )
-4. Eötvös effect ( Maybe )
-5. Spin Drift ( Maybe )
 
 # Bugs
 * Non Currently
