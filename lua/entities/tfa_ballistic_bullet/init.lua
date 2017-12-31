@@ -3,6 +3,8 @@ AddCSLuaFile( "shared.lua" )
 
 include('shared.lua')
 
+ENT.Locked = false
+
 function ENT:Initialize()
 
 	self:SetModel( "models/bullets/w_pbullet1.mdl" )
@@ -10,8 +12,14 @@ function ENT:Initialize()
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_NONE )
 
-	timer.Simple( 0.05, function()
-		util.SpriteTrail( self, 1, Color(255, 152, 43), false, 0.1, 0, 0.01, 1, "trails/smoke.vmt")
-	end )
 
+	self.Locked = false
+
+end
+
+function ENT:Think()
+	if self.InitialPos:Distance( self:GetPos() ) > 1000 and not self.Locked then
+		util.SpriteTrail( self, 1, Color(255, 152, 43), false, 2, 1, 0.005, 1, "trails/smoke.vmt")
+		self.Locked = true
+	end
 end

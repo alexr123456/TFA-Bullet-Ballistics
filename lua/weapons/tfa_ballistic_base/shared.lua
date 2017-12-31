@@ -3,7 +3,8 @@ SWEP.Base = "tfa_gun_base"
 DEFINE_BASECLASS(SWEP.Base)
 
 SWEP.Primary.Velocity = 500
-SWEP.TracerEffect = "dax_bullettrail3_green" // dax_bullettrail2, dax_bullettrail2_red, dax_bullettrail2_green, dax_bullettrail3, dax_bullettrail3_red, dax_bullettrail3_green, nil to disable
+SWEP.EnableTracer = true
+SWEP.TracerColor = Color( 255, 152, 43 )
 
 local TracerName
 local cv_forcemult = GetConVar("sv_tfa_force_multiplier")
@@ -23,7 +24,7 @@ function SWEP:ShootBullet(damage, recoil, num_bullets, aimcone, disablericochet,
 			angles:RotateAroundAxis( angles:Right(), ( -aimcone / 2 + math.Rand(0, aimcone) ) * 90)
 			angles:RotateAroundAxis( angles:Up(), ( -aimcone / 2 + math.Rand(0, aimcone) ) * 90)
 
-			TFA_BALLISTICS.AddBullet( damage, velocity, self.Owner:EyePos(), angles:Forward(), self.Owner, self.Owner:GetAngles(), self, self.TracerEffect )
+			TFA_BALLISTICS.AddBullet( damage, velocity, self.Owner:GetShootPos(), angles:Forward(), self.Owner, self.Owner:GetAngles(), self, self.EnableTracer, self.TracerColor )
 		end
 	else
 		if self.Tracer == 1 then
@@ -125,4 +126,103 @@ function SWEP:Initialize()
 end
 
 function SWEP:DoImpactEffect()
+end
+
+if CLIENT then
+	local cos, sin, abs, max, rad1, log, pow = math.cos, math.sin, math.abs, math.max, math.rad, math.log, math.pow
+      local surface = surface
+      function draw.Arc(cx,cy,radius,thickness,startang,endang,roughness,color)
+      	surface.SetDrawColor(color)
+      	surface.DrawArc(surface.PrecacheArc(cx,cy,radius,thickness,startang,endang,roughness))
+      end
+
+      function surface.DrawArc(arc)
+      	for k,v in ipairs(arc) do
+      		surface.DrawPoly(v)
+      	end
+      end
+
+      function surface.PrecacheArc(cx,cy,radius,thickness,startang,endang,roughness)
+      	local quadarc = {}
+      	local startang,endang = startang or 0, endang or 0
+      	local diff = abs(startang-endang)
+      	local smoothness = log(diff,2)/2
+      	local step = diff / (pow(2,smoothness))
+      	if startang > endang then
+      		step = abs(step) * -1
+      	end
+      	local inner = {}
+      	local outer = {}
+      	local ct = 1
+      	local r = radius - thickness
+      	for deg=startang, endang, step do
+      		local rad = rad1(deg)
+      		local cosrad, sinrad = cos(rad), sin(rad)
+      		local ox, oy = cx+(cosrad*r), cy+(-sinrad*r)
+      		inner[ct] = {
+      			x=ox,
+      			y=oy,
+      			u=(ox-cx)/radius + .5,
+      			v=(oy-cy)/radius + .5,
+      		}
+      		local ox2, oy2 = cx+(cosrad*radius), cy+(-sinrad*radius)
+      		outer[ct] = {
+      			x=ox2,
+      			y=oy2,
+      			u=(ox2-cx)/radius + .5,
+      			v=(oy2-cy)/radius + .5,
+      		}
+      		ct = ct + 1
+      	end
+      	for tri=1,ct do
+      		local p1,p2,p3,p4
+      		local t = tri+1
+      		p1=outer[tri]
+      		p2=outer[t]
+      		p3=inner[t]
+      		p4=inner[tri]
+      		quadarc[tri] = {p1,p2,p3,p4}
+      	end
+      	return quadarc
+
+      end
+
+      function draw.Circle( x, y, radius, seg )
+	local cir = {}
+
+	table.insert( cir, { x = x, y = y, u = 0.5, v = 0.5 } )
+      	for i = 0, seg do
+      		local a = math.rad( ( i / seg ) * -360 )
+      		table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+      	end
+
+      	local a = math.rad( 0 )
+      	table.insert( cir, { x = x + math.sin( a ) * radius, y = y + math.cos( a ) * radius, u = math.sin( a ) / 2 + 0.5, v = math.cos( a ) / 2 + 0.5 } )
+
+      	surface.DrawPoly( cir )
+      end
+
+end
+
+function SWEP:DrawHUD()
+	BaseClass.DrawHUD( self )
+
+	surface.SetDrawColor( 26, 26, 26, 150 )
+	draw.Circle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.02, 30 )
+
+	surface.SetDrawColor( 26, 26, 26, 200 )
+	draw.Circle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.016, 30 )
+
+	startAng = ( StormFox.GetNetworkData( "WindAngle" ) + ( LocalPlayer():GetAngles().y * -1 ) ) - ( StormFox.GetNetworkData( "Wind" ) )
+	endAng = ( StormFox.GetNetworkData( "WindAngle" ) + ( LocalPlayer():GetAngles().y * -1 ) ) + ( StormFox.GetNetworkData( "Wind" ) )
+
+	surface.DrawCircle( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ) , ScrW() * 0.0196, 26, 26, 26, 200)
+
+	draw.Arc( ScrW() / 2, ScrH() - ( ScrW() * 0.02 ), ScrW() * 0.02, ScrW() * 0.004, startAng, endAng, 1, Color(225, 225, 225) )
+
+	surface.SetFont( "TFA_BALLISTICS_Font" )
+	surface.SetTextColor( 225, 225, 225 )
+	local width, height = surface.GetTextSize( math.Round( StormFox.GetNetworkData( "Wind" ) ) )
+	surface.SetTextPos( ( ScrW() / 2 ) - ( width / 2 ), ( ScrH() - ( ScrW() * 0.02 ) ) - ( height / 2 ) )
+	surface.DrawText( math.Round( StormFox.GetNetworkData( "Wind" ) ) )
 end

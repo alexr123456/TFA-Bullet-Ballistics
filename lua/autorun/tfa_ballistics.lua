@@ -2,23 +2,23 @@ TFA_BALLISTICS = {}
 
 TFA_BALLISTICS.Bullets = {}
 
-TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weapon, tracereffect)
+TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weapon, tracerenabled, tracercolor )
 
       if SERVER then
             local bulletent
 
-            if tracereffect then
-                  bulletent = ents.Create("tfa_ballistic_bullet")
-                  bulletent:SetPos( pos )
-                  bulletent:SetAngles( ang )
-                  bulletent:SetOwner( owner )
-                  bulletent:Spawn()
-            end
+            bulletent = ents.Create("tfa_ballistic_bullet")
+            bulletent:SetPos( pos )
+            bulletent:SetAngles( ang )
+            bulletent:SetOwner( owner )
+            bulletent.InitialPos = pos
+            bulletent:Spawn()
 
             local bulletdata = {
                   ["damage"] = damage,
                   ["velocity"] = velocity,
                   ["pos"] = pos,
+                  ["initialpos"] = pos,
                   ["dir"] = dir,
                   ["owner"] = owner,
                   ["ang"] = ang,
@@ -79,7 +79,7 @@ if SERVER then
             end
 
             // Final Pos
-            local finalpos = bullet["pos"] + ( finalvelocity - ( windangle:Forward() * windspeed ) ) * FrameTime()
+            local finalpos = bullet["pos"] + ( finalvelocity + ( windangle:Forward() * windspeed ) ) * FrameTime()
 
             local bullet_trace = util.TraceLine( {
             	start = bullet["pos"],
@@ -231,4 +231,22 @@ else
             local windspeed = net.ReadInt( 32 )
             TFA_BALLISTICS.WindSpeed = windspeed
       end)
+
+      surface.CreateFont( "TFA_BALLISTICS_Font", {
+      	font = "Roboto Condensed",
+      	extended = false,
+      	size = ScreenScale( 7 ),
+      	weight = 500,
+      	blursize = 0,
+      	scanlines = 0,
+      	antialias = true,
+      	underline = false,
+      	italic = false,
+      	strikeout = false,
+      	symbol = false,
+      	rotary = false,
+      	shadow = false,
+      	additive = false,
+      	outline = false,
+      } )
 end
