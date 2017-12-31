@@ -12,6 +12,7 @@ TFA_BALLISTICS.AddBullet = function(damage, velocity, pos, dir, owner, ang, weap
             bulletent:SetAngles( ang )
             bulletent:SetOwner( owner )
             bulletent.InitialPos = pos
+            bulletent.Color = tracercolor
             bulletent:Spawn()
 
             local bulletdata = {
